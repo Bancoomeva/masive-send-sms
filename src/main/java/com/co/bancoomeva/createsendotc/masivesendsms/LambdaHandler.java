@@ -7,15 +7,15 @@ import static com.co.bancoomeva.createsendotc.masivesendsms.auditoria.canales.AC
 import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.AUTHENTICATION;
 import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.CARACTER_DOMAIN;
 import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.CARACTER_URL;
-import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.DOMAIN_EMPTY;
+import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.REGEX_MAIN;
 import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.TEXT_EXCEEDS;
 import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.URL_DOMAIN_EXCEEDS;
-import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.URL_EMPTY;
 import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.URL_EXCEEDS;
 import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.URL_NOT_VALID;
 import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.URL_SOURCE;
 import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.VALID_URL;
 import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.isLongMessage;
+import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.ERROR_SHORT_URL_CONFIG;
 
 import java.net.http.HttpResponse;
 import java.util.Optional;
@@ -30,7 +30,6 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import com.co.bancoomeva.createsendotc.masivesendsms.auditoria.canales.FieldAuditoriaCanales;
 import com.co.bancoomeva.createsendotc.masivesendsms.auditoria.canales.InputValidationException;
 import com.co.bancoomeva.createsendotc.masivesendsms.auditoria.canales.ValidateField;
-import com.co.bancoomeva.createsendotc.masivesendsms.constants.Common;
 import com.co.bancoomeva.createsendotc.masivesendsms.constants.Environment;
 import com.co.bancoomeva.createsendotc.masivesendsms.model.MessageRequest;
 import com.co.bancoomeva.createsendotc.masivesendsms.model.MessageResponse;
@@ -54,10 +53,6 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
 	@Override
 	public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent,
 			Context context) {
-
-		LOGGER.info("iniciando");
-
-		LOGGER.info(apiGatewayProxyRequestEvent.toString());
 
 		try {
 
@@ -111,29 +106,25 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
 				throw new InputValidationException(TEXT_EXCEEDS);
 			}
 			if (messageRequest.getText().contains(VALID_URL)) {
-				if (messageRequest.getShortUrlConfig().getUrl() == null
-						|| messageRequest.getShortUrlConfig().getUrl().isEmpty()) {
-					throw new InputValidationException(URL_EMPTY);
-				} else if (messageRequest.getShortUrlConfig().getDomainShorturl() == null
-						|| messageRequest.getShortUrlConfig().getDomainShorturl().isEmpty()) {
-					throw new InputValidationException(DOMAIN_EMPTY);
+
+				if (messageRequest.getShortUrlConfig() != null) {
+
+					validateField.validateFieldNull("url",
+							Optional.ofNullable(messageRequest.getShortUrlConfig().getUrl()));
+					validateField.validateSize(messageRequest.getShortUrlConfig().getUrl(), CARACTER_URL, URL_EXCEEDS);
+					validateField.validateFieldNull("domainShorturl",
+							Optional.ofNullable(messageRequest.getShortUrlConfig().getDomainShorturl()));
+					validateField.validateSize(messageRequest.getShortUrlConfig().getDomainShorturl(), CARACTER_DOMAIN,
+							URL_DOMAIN_EXCEEDS);
+					validateField.validateRegEx(messageRequest.getShortUrlConfig().getUrl(), REGEX_MAIN, URL_NOT_VALID);
+
 				} else {
-					if (messageRequest.getShortUrlConfig().getUrl().length() > CARACTER_URL) {
-						throw new InputValidationException(URL_EXCEEDS);
-					} else if (messageRequest.getShortUrlConfig().getDomainShorturl().length() > CARACTER_DOMAIN) {
-						throw new InputValidationException(URL_DOMAIN_EXCEEDS);
-					}
+					throw new InputValidationException(ERROR_SHORT_URL_CONFIG);
 				}
 			}
-			boolean urlvalid = new Common().validaUrl(messageRequest.getShortUrlConfig().getUrl());
-			if (urlvalid) {
-				throw new InputValidationException(URL_NOT_VALID);
-			}
-
 		} else {
 			throw new InputValidationException(MSG_BODY_NULL);
 		}
-
 	}
 
 }
