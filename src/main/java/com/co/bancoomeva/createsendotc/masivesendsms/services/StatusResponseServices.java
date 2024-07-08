@@ -1,11 +1,11 @@
 package com.co.bancoomeva.createsendotc.masivesendsms.services;
 
-import static com.co.bancoomeva.createsendotc.masivesendsms.auditoria.canales.ACCommons.BAD_REQUETS;
-import static com.co.bancoomeva.createsendotc.masivesendsms.auditoria.canales.ACCommons.MSG_INTERNAL_SERVER_ERROR;
-import static com.co.bancoomeva.createsendotc.masivesendsms.auditoria.canales.ACCommons.MSG_UNAUTHORIZED;
-import static com.co.bancoomeva.createsendotc.masivesendsms.auditoria.canales.ACCommons.OK;
-import static com.co.bancoomeva.createsendotc.masivesendsms.auditoria.canales.ACCommons.SCODE_INTERNAL_SERVER_ERROR;
-import static com.co.bancoomeva.createsendotc.masivesendsms.auditoria.canales.ACCommons.UNAUTHORIZED;
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.BAD_REQUETS;
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.MSG_INTERNAL_SERVER_ERROR;
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.MSG_UNAUTHORIZED;
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.OK;
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.SCODE_INTERNAL_SERVER_ERROR;
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.UNAUTHORIZED;
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.co.bancoomeva.createsendotc.masivesendsms.model.StatusResponse;

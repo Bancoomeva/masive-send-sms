@@ -1,9 +1,11 @@
 package com.co.bancoomeva.createsendotc.masivesendsms;
 
-import static com.co.bancoomeva.createsendotc.masivesendsms.auditoria.canales.ACCommons.BAD_REQUETS;
-import static com.co.bancoomeva.createsendotc.masivesendsms.auditoria.canales.ACCommons.MSG_BODY_NULL;
-import static com.co.bancoomeva.createsendotc.masivesendsms.auditoria.canales.ACCommons.OK;
-import static com.co.bancoomeva.createsendotc.masivesendsms.auditoria.canales.ACCommons.UNAUTHORIZED;
+
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.MSG_BODY_NULL;
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.UNAUTHORIZED;
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.BAD_REQUETS;
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.OK;
+
 import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.AUTHENTICATION;
 import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.CARACTER_DOMAIN;
 import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.CARACTER_URL;
@@ -27,9 +29,8 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
-import com.co.bancoomeva.createsendotc.masivesendsms.auditoria.canales.FieldAuditoriaCanales;
-import com.co.bancoomeva.createsendotc.masivesendsms.auditoria.canales.InputValidationException;
-import com.co.bancoomeva.createsendotc.masivesendsms.auditoria.canales.ValidateField;
+import com.co.bancoomeva.auditoria.auditoria_canales.ValidateField;
+import com.co.bancoomeva.auditoria.auditoria_canales.exceptio.InputValidationException;
 import com.co.bancoomeva.createsendotc.masivesendsms.constants.Environment;
 import com.co.bancoomeva.createsendotc.masivesendsms.model.MessageRequest;
 import com.co.bancoomeva.createsendotc.masivesendsms.model.MessageResponse;
@@ -53,12 +54,11 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
 	@Override
 	public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent,
 			Context context) {
-
+		
 		try {
 
 			MessageRequest messageRequest = Gson.fromJson(apiGatewayProxyRequestEvent.getBody(), MessageRequest.class);
-			validateField.validateFieldAuditoriaCanales(
-					Gson.fromJson(apiGatewayProxyRequestEvent.getBody(), FieldAuditoriaCanales.class));
+			validateField.validateFieldAuditoriaCanales(validateField.fieldAuditoria(apiGatewayProxyRequestEvent.getHeaders()));
 
 			validateInputField(messageRequest);
 
@@ -109,13 +109,10 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
 
 				if (messageRequest.getShortUrlConfig() != null) {
 
-					validateField.validateFieldNull("url",
-							Optional.ofNullable(messageRequest.getShortUrlConfig().getUrl()));
+					validateField.validateFieldNull("url", Optional.ofNullable(messageRequest.getShortUrlConfig().getUrl()));
 					validateField.validateSize(messageRequest.getShortUrlConfig().getUrl(), CARACTER_URL, URL_EXCEEDS);
-					validateField.validateFieldNull("domainShorturl",
-							Optional.ofNullable(messageRequest.getShortUrlConfig().getDomainShorturl()));
-					validateField.validateSize(messageRequest.getShortUrlConfig().getDomainShorturl(), CARACTER_DOMAIN,
-							URL_DOMAIN_EXCEEDS);
+					validateField.validateFieldNull("domainShorturl", Optional.ofNullable(messageRequest.getShortUrlConfig().getDomainShorturl()));
+					validateField.validateSize(messageRequest.getShortUrlConfig().getDomainShorturl(), CARACTER_DOMAIN, URL_DOMAIN_EXCEEDS);
 					validateField.validateRegEx(messageRequest.getShortUrlConfig().getUrl(), REGEX_MAIN, URL_NOT_VALID);
 
 				} else {
