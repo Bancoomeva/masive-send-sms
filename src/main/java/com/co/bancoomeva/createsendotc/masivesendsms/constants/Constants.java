@@ -15,13 +15,9 @@ public class Constants {
 	public static final String URL_EMPTY = "The required url parameter is missing.";
 	public static final String VALID_URL = "SHORTURL";
 	public static final String DOMAIN_EMPTY = "Url or domain url parameters are not valid";
-	public static final String URL_NOT_VALID = "Replacement field short url is not correct";
 
-	public static final String REGEX_MAIN = "^(http|https)://([a-zA-Z0-9]+\\.)+[a-zA-Z]{2,}(/{0,1}[^\\s]*)?$";
+	public static final String ERROR_SHORT_URL_CONFIG = "the field 'shortUrlConfig' cant be declare";
 
-	public static final String ERROR_SHORT_URL_CONFIG = "the field shortUrlConfig cant be declare";
-
-	public static final int isLongMessage = 160;
 	public static final int CARACTER_URL = 1000;
 	public static final Integer CARACTER_DOMAIN = 50;
 

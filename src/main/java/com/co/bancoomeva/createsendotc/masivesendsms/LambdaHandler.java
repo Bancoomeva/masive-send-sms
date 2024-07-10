@@ -1,29 +1,28 @@
 package com.co.bancoomeva.createsendotc.masivesendsms;
 
-
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Constants.REGEX_POSITIVE_NUMBER;
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.MSN_FILED_NUMBER_ERROR;
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.MSN_FILED_URL_ERROR;
 import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.MSG_BODY_NULL;
 import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.UNAUTHORIZED;
 import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.BAD_REQUETS;
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Constants.REGEX_URL;
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.FINISHED;
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.FIELD;
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.INIT;
 import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.OK;
 
-import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.AUTHENTICATION;
-import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.CARACTER_DOMAIN;
-import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.CARACTER_URL;
-import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.REGEX_MAIN;
-import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.TEXT_EXCEEDS;
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.INFO;
+
+import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.ERROR_SHORT_URL_CONFIG;
 import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.URL_DOMAIN_EXCEEDS;
+import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.CARACTER_DOMAIN;
+import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.AUTHENTICATION;
+import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.CARACTER_URL;
+import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.TEXT_EXCEEDS;
 import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.URL_EXCEEDS;
-import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.URL_NOT_VALID;
 import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.URL_SOURCE;
 import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.VALID_URL;
-import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.isLongMessage;
-import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.ERROR_SHORT_URL_CONFIG;
-
-import java.net.http.HttpResponse;
-import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
@@ -31,6 +30,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.co.bancoomeva.auditoria.auditoria_canales.ValidateField;
 import com.co.bancoomeva.auditoria.auditoria_canales.exceptio.InputValidationException;
+import com.co.bancoomeva.auditoria.auditoria_canales.model.LogTransaction;
 import com.co.bancoomeva.createsendotc.masivesendsms.constants.Environment;
 import com.co.bancoomeva.createsendotc.masivesendsms.model.MessageRequest;
 import com.co.bancoomeva.createsendotc.masivesendsms.model.MessageResponse;
@@ -38,6 +38,13 @@ import com.co.bancoomeva.createsendotc.masivesendsms.services.Masivapp;
 import com.co.bancoomeva.createsendotc.masivesendsms.services.StatusResponseServices;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import java.net.http.HttpResponse;
+import java.sql.Timestamp;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
@@ -54,20 +61,21 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
 	@Override
 	public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent,
 			Context context) {
-		
+
+		LOGGER.debug("Invoque method handleRequest: " + INIT);
+		LOGGER.info(Gson.toJson(new LogTransaction(new Timestamp(System.currentTimeMillis()), INFO, "", context.getAwsRequestId(), "", "", "", null), LogTransaction.class));
+
 		try {
 
-			MessageRequest messageRequest = Gson.fromJson(apiGatewayProxyRequestEvent.getBody(), MessageRequest.class);
-			validateField.validateFieldAuditoriaCanales(validateField.fieldAuditoria(apiGatewayProxyRequestEvent.getHeaders()));
+			validateField.validateFieldAuditoriaCanales(
+					validateField.fieldAuditoria(apiGatewayProxyRequestEvent.getHeaders()));
 
+			MessageRequest messageRequest = Gson.fromJson(apiGatewayProxyRequestEvent.getBody(), MessageRequest.class);
 			validateInputField(messageRequest);
 
 			HttpResponse<String> response;
 
-			response = new Masivapp().sendMessage(apiGatewayProxyRequestEvent, new Environment().getEnv(URL_SOURCE),
-					new Environment().getEnv(AUTHENTICATION));
-
-			System.out.println(response.statusCode());
+			response = new Masivapp().sendMessage(apiGatewayProxyRequestEvent, new Environment().getEnv(URL_SOURCE), new Environment().getEnv(AUTHENTICATION));
 
 			switch (response.statusCode()) {
 			case OK:
@@ -87,33 +95,35 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
 		} catch (InputValidationException e) {
 			apiGatewayProxyResponseEvent = statusResponseServices.badRequest(e.getMessage());
 		} catch (Exception e) {
-			System.out.println(e);
+			LOGGER.error(e.toString());
 			apiGatewayProxyResponseEvent = statusResponseServices.internalServerError();
 		}
+
+		LOGGER.debug("Invoque method handleRequest: " + FINISHED);
 
 		return apiGatewayProxyResponseEvent;
 	}
 
 	private void validateInputField(MessageRequest messageRequest) throws InputValidationException {
 
+		LOGGER.debug("Invoque method validateInputField: " + INIT);
+
 		if (messageRequest != null) {
 
 			validateField.validateFieldNull("to", Optional.ofNullable(messageRequest.getTo()));
+			validateField.validateRegEx(messageRequest.getTo(), REGEX_POSITIVE_NUMBER, MSN_FILED_NUMBER_ERROR.replace(FIELD, "to"));
 			validateField.validateFieldNull("text", Optional.ofNullable(messageRequest.getText()));
 			validateField.validateFieldNull("customdata", Optional.ofNullable(messageRequest.getCustomdata()));
+			validateField.validateSize(messageRequest.getText(), 160, TEXT_EXCEEDS);
 
-			if (messageRequest.getText().length() > isLongMessage) {
-				throw new InputValidationException(TEXT_EXCEEDS);
-			}
 			if (messageRequest.getText().contains(VALID_URL)) {
-
 				if (messageRequest.getShortUrlConfig() != null) {
 
 					validateField.validateFieldNull("url", Optional.ofNullable(messageRequest.getShortUrlConfig().getUrl()));
 					validateField.validateSize(messageRequest.getShortUrlConfig().getUrl(), CARACTER_URL, URL_EXCEEDS);
 					validateField.validateFieldNull("domainShorturl", Optional.ofNullable(messageRequest.getShortUrlConfig().getDomainShorturl()));
-					validateField.validateSize(messageRequest.getShortUrlConfig().getDomainShorturl(), CARACTER_DOMAIN, URL_DOMAIN_EXCEEDS);
-					validateField.validateRegEx(messageRequest.getShortUrlConfig().getUrl(), REGEX_MAIN, URL_NOT_VALID);
+					validateField.validateSize(messageRequest.getShortUrlConfig().getDomainShorturl(), CARACTER_DOMAIN,	URL_DOMAIN_EXCEEDS);
+					validateField.validateRegEx(messageRequest.getShortUrlConfig().getUrl(), REGEX_URL,	MSN_FILED_URL_ERROR.replace(FIELD, "url"));
 
 				} else {
 					throw new InputValidationException(ERROR_SHORT_URL_CONFIG);
@@ -122,6 +132,8 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
 		} else {
 			throw new InputValidationException(MSG_BODY_NULL);
 		}
+
+		LOGGER.debug("Invoque method handleRequest: " + FINISHED);
 	}
 
 }

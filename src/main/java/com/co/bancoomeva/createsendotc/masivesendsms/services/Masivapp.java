@@ -1,26 +1,32 @@
 package com.co.bancoomeva.createsendotc.masivesendsms.services;
 
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.FINISHED;
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.INIT;
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.NON_FOUND;
+import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.APPLICATION_JSON;
+import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.HEADER_AUTHORIZATION;
+import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.HEADER_CONTENT_TYPE;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
-
-import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.APPLICATION_JSON;
-import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.HEADER_AUTHORIZATION;
-import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.HEADER_CONTENT_TYPE;
-
-import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.NON_FOUND;
 
 public class Masivapp {
 
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(Masivapp.class);
+
+	
 	public HttpResponse<String> sendMessage(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent, String url,
 			String credentials) throws Exception {
 
-		// LOGGER.info("Method: Invoking sendMessage");
-
-		// LOGGER.info("Method: Services Invoked " + url);
+		LOGGER.debug("Invoque method sendMessage: " + INIT);
 
 		HttpRequest httpRequest = HttpRequest.newBuilder().uri(new URI(url)).version(HttpClient.Version.HTTP_2)
 				.setHeader(HEADER_CONTENT_TYPE, APPLICATION_JSON).setHeader(HEADER_AUTHORIZATION, credentials)
@@ -28,10 +34,12 @@ public class Masivapp {
 
 		HttpResponse<String> response = HttpClient.newHttpClient().send(httpRequest,
 				HttpResponse.BodyHandlers.ofString());
-
+		
+		LOGGER.debug("HttpResponse response: " + response);
+		
 		noFound(response);
 
-		// LOGGER.info("Method: Finished sendMessage");
+		LOGGER.debug("Invoque method sendMessage: " + FINISHED);
 
 		return response;
 
@@ -39,7 +47,7 @@ public class Masivapp {
 
 	private void noFound(HttpResponse<String> httpRequest) throws Exception {
 		if (httpRequest.statusCode() == NON_FOUND) {
-			// LOGGER.info("Method: sendMessage {url no found}");
+			LOGGER.error("URL NO FOUND");
 			throw new Exception();
 		}
 	}

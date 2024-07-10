@@ -1,5 +1,8 @@
 package com.co.bancoomeva.createsendotc.masivesendsms;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 
@@ -9,17 +12,7 @@ public class TestLambdaHandler {
 	
 		
 		
-		String body = "{\r\n"
-				
-				+ "   \"messageId\":\"LFMSGNLL23_longMessage\",\r\n"
-				+ "   \"invokerDateTime\":\"2024-05-14T10:38:13\",\r\n"
-				+ "   \"ipTransaccion\":\"10.11.60.68\",\r\n"
-				+ "   \"codTransaccion\":\"931001\",\r\n"
-				+ "   \"canal\":\"1\",\r\n"
-				+ "   \"usuario\":\"LRivas\",\r\n"								
-				+ "   \"action\":\"57312dsf445885165\",\r\n"
-				
-								
+		String body = "{\r\n"								
 				+ "   \"to\":\"573222428392\",\r\n"				
 				+ "   \"text\":\"Hola Cielo Mensaje de prueba, esta es una url: SHORTURL\",\r\n"
 				+ "   \"customdata\":\"CUS_ID_0125\",\r\n"
@@ -28,7 +21,8 @@ public class TestLambdaHandler {
 				+ "   \"isLongmessage\":false,\r\n"
 				+ "   \"isRandomRoute\":false,\r\n"
 				+ "   \"shortUrlConfig\":{\r\n"
-				+ "      \"url\":\"https://www.youtube.com\",\r\n"
+			//	+ "      \"url\":\"https://www.youtube.com\",\r\n"
+				+ "      \"url\":\"asdutube.com\",\r\n"
 				+ "      \"domainShorturl\":\"http://ma.sv/\"\r\n"
 				+ "   }\r\n"
 				+ "}";
@@ -39,35 +33,36 @@ public class TestLambdaHandler {
 		
 		
 		String body2 = "{\r\n"
-				
-				+ "   \"messageId\":\"LFMSGNLL23_longMessage\",\r\n"
-				+ "   \"invokerDateTime\":\"2024-05-14T10:38:13\",\r\n"
-				+ "   \"ipTransaccion\":\"10.11.60.68\",\r\n"
-				+ "   \"codTransaccion\":\"931001\",\r\n"
-				+ "   \"canal\":\"1\",\r\n"
-				+ "   \"usuario\":\"LRivas\",\r\n"								
-				+ "   \"action\":\"57312dsf445885165\",\r\n"				
-								
+											
 				+ "   \"to\":\"573222428392\",\r\n"				
-				+ "   \"text\":\"Hola Cielo Mensaje de prueba, esta es una url: SHORTURL\",\r\n"
+				+ "   \"text\":\"Hola Cielo Mensaje de prueba, esta es una url\",\r\n"
 				+ "   \"customdata\":\"CUS_ID_0125\",\r\n"
 				+ "   \"isPremium\":false,\r\n"
 				+ "   \"isFlash\":false,\r\n"
 				+ "   \"isLongmessage\":false,\r\n"
-				+ "   \"isRandomRoute\":false,\r\n"
-				+ "   \"shortUrlConfig\":{\r\n"
-				+ "      \"url\":\"https://www.youtsdfsdfsdfsdfgsdfdfgsdfgsdfgdsfube.com\",\r\n"	
-				+ "      \"domainShorturl\":\"https://www.youtsdfsdfsdfsdfgsdfdfgsdfgsdfgdsfube.com\"\r\n"	
-				
-				+ "   }\r\n"
+				+ "   \"isRandomRoute\":false\r\n"				
 				+ "}";
+		
+		
+		
+		Map<String, String> headers = new HashMap<String, String>();
+		
+	
 		
 		APIGatewayProxyRequestEvent request= new APIGatewayProxyRequestEvent();
 		LambdaHandler lambdaHandler = new LambdaHandler ();
 		
 		
-		request.setBody(body2);		
+		headers.put("messageId", "test");
+		headers.put("invokerDateTime", "2024-05-14T10:38:13");
+		headers.put("ipTransaccion", "2001:0ca8:85a3:0000:0000:8a2e:0370:7334");
+		headers.put("codTransaccion", "test");
+		headers.put("canal", "0");
+		headers.put("usuario", "test");
 		
+		
+		request.setBody(body);		
+		request.setHeaders(headers);
 		
 		APIGatewayProxyResponseEvent response = lambdaHandler.handleRequest(request, null);
 		
