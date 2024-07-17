@@ -21,8 +21,8 @@ public class TestLambdaHandler {
 				+ "   \"isLongmessage\":false,\r\n"
 				+ "   \"isRandomRoute\":false,\r\n"
 				+ "   \"shortUrlConfig\":{\r\n"
-			//	+ "      \"url\":\"https://www.youtube.com\",\r\n"
-				+ "      \"url\":\"asdutube.com\",\r\n"
+				+ "      \"url\":\"https://www.youtube.com\",\r\n"
+			//	+ "      \"url\":\"asdutube.com\",\r\n"
 				+ "      \"domainShorturl\":\"http://ma.sv/\"\r\n"
 				+ "   }\r\n"
 				+ "}";
@@ -53,7 +53,7 @@ public class TestLambdaHandler {
 		LambdaHandler lambdaHandler = new LambdaHandler ();
 		
 		
-		headers.put("messageId", "test");
+		headers.put("messageId", "");
 		headers.put("invokerDateTime", "2024-05-14T10:38:13");
 		headers.put("ipTransaccion", "2001:0ca8:85a3:0000:0000:8a2e:0370:7334");
 		headers.put("codTransaccion", "test");

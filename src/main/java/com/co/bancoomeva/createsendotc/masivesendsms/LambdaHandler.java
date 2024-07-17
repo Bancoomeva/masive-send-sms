@@ -63,12 +63,11 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
 			Context context) {
 
 		LOGGER.debug("Invoque method handleRequest: " + INIT);
-		LOGGER.info(Gson.toJson(new LogTransaction(new Timestamp(System.currentTimeMillis()), INFO, "", context.getAwsRequestId(), "", "", "", null), LogTransaction.class));
+	//	LOGGER.info(Gson.toJson(new LogTransaction(new Timestamp(System.currentTimeMillis()), INFO, "", context.getAwsRequestId(), "", "", "", null), LogTransaction.class));
 
 		try {
 
-			validateField.validateFieldAuditoriaCanales(
-					validateField.fieldAuditoria(apiGatewayProxyRequestEvent.getHeaders()));
+			validateField.validateFieldAuditoriaCanales(validateField.fieldAuditoria(apiGatewayProxyRequestEvent.getHeaders()));
 
 			MessageRequest messageRequest = Gson.fromJson(apiGatewayProxyRequestEvent.getBody(), MessageRequest.class);
 			validateInputField(messageRequest);
