@@ -10,5 +10,6 @@ cdk.out
 # Parcel build directories
 .cache
 .build
+.class
 ci
 target/
