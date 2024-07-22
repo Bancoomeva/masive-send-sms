@@ -33,7 +33,13 @@ public class TestLambdaHandler {
 		
 		
 		String body2 = "{\r\n"
-											
+				+ " \"headers\":{ "
+				+ "   \"request-date-time\":\"2024-07-22T11:38:13\",\r\n"
+				+ "   \"channel\":\"NP_1_1\",\r\n"
+				+ "   \"request-id\":\"e47a6701-cc67-4e17-a756-884be6b49cd1\",\r\n"
+				+ "   \"ip-terminal\":\"10.11.60.68\",\r\n"
+				+ "   \"user-login\":\"Cfalcao\"\r\n"
+				+ "},"						
 				+ "   \"to\":\"573222428392\",\r\n"				
 				+ "   \"text\":\"Hola Cielo Mensaje de prueba, esta es una url\",\r\n"
 				+ "   \"customdata\":\"CUS_ID_0125\",\r\n"
@@ -53,16 +59,16 @@ public class TestLambdaHandler {
 		LambdaHandler lambdaHandler = new LambdaHandler ();
 		
 		
-		headers.put("messageId", "");
-		headers.put("invokerDateTime", "2024-05-14T10:38:13");
-		headers.put("ipTransaccion", "2001:0ca8:85a3:0000:0000:8a2e:0370:7334");
-		headers.put("codTransaccion", "test");
-		headers.put("canal", "0");
-		headers.put("usuario", "test");
+//		headers.put("messageId", "");
+//		headers.put("invokerDateTime", "2024-05-14T10:38:13");
+//		headers.put("ipTransaccion", "2001:0ca8:85a3:0000:0000:8a2e:0370:7334");
+//		headers.put("codTransaccion", "test");
+//		headers.put("canal", "0");
+//		headers.put("usuario", "test");
 		
 		
-		request.setBody(body);		
-		request.setHeaders(headers);
+		request.setBody(body2);		
+//		request.setHeaders(headers);
 		
 		APIGatewayProxyResponseEvent response = lambdaHandler.handleRequest(request, null);
 		

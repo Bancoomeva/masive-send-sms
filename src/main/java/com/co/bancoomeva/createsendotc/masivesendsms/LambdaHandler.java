@@ -31,6 +31,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import com.co.bancoomeva.auditoria.auditoria_canales.ValidateField;
 import com.co.bancoomeva.auditoria.auditoria_canales.exceptio.InputValidationException;
 import com.co.bancoomeva.auditoria.auditoria_canales.model.LogTransaction;
+import com.co.bancoomeva.auditoria.auditoria_canales.model.HeadersAuditoria;
 import com.co.bancoomeva.createsendotc.masivesendsms.constants.Environment;
 import com.co.bancoomeva.createsendotc.masivesendsms.model.MessageRequest;
 import com.co.bancoomeva.createsendotc.masivesendsms.model.MessageResponse;
@@ -50,7 +51,7 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(LambdaHandler.class);
 
-	private Gson Gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+	private Gson Gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().setFieldNamingStrategy(field -> field.getName().replace("_", "-")).create();
 
 	private StatusResponseServices statusResponseServices = new StatusResponseServices();
 
@@ -63,14 +64,17 @@ public class LambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent
 			Context context) {
 
 		LOGGER.debug("Invoque method handleRequest: " + INIT);
-	//	LOGGER.info(Gson.toJson(new LogTransaction(new Timestamp(System.currentTimeMillis()), INFO, "", context.getAwsRequestId(), "", "", "", null), LogTransaction.class));
 
 		try {
 
-			validateField.validateFieldAuditoriaCanales(validateField.fieldAuditoria(apiGatewayProxyRequestEvent.getHeaders()));
 
 			MessageRequest messageRequest = Gson.fromJson(apiGatewayProxyRequestEvent.getBody(), MessageRequest.class);
+			new ValidateField().ValideteFirstAuditoria(Gson.fromJson(Gson.toJson(messageRequest.getHeaders()), HeadersAuditoria.class) );
+			new ValidateField().validateFieldAuditoriaCanales(Gson.fromJson(Gson.toJson(messageRequest.getHeaders()), HeadersAuditoria.class));
 			validateInputField(messageRequest);
+				LOGGER.info(Gson.toJson(new LogTransaction(new Timestamp(System.currentTimeMillis()), INFO, "", context.getAwsRequestId(), "", 
+						messageRequest.getHeaders().getUser_login(),
+						messageRequest.getHeaders().getIp_terminal(), null), LogTransaction.class));
 
 			HttpResponse<String> response;
 
