@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent.ProxyRequestContext;
 
 public class TestLambdaHandler {
 
@@ -27,19 +28,20 @@ public class TestLambdaHandler {
 				+ "   }\r\n"
 				+ "}";
 		
-		
+	//	795f7a0d-9417-4c1a-bbd9-78c3142f93ea
 
 		
 		
 		
 		String body2 = "{\r\n"
 				+ " \"headers\":{ "
-				+ "   \"request-date-time\":\"2024-07-22T11:38:13\",\r\n"
-				+ "   \"channel\":\"NP_1_1\",\r\n"
-				+ "   \"request-id\":\"e47a6701-cc67-4e17-a756-884be6b49cd1\",\r\n"
-				+ "   \"ip-terminal\":\"10.11.60.68\",\r\n"
+				+ "   \"request-date-time\":\"2024-07-22T11:38:13\",\r\n"			
+				+ "   \"channel\":\"NP_1_1\",\r\n"					
+				+ "   \"request-id\":\"e47a6701-cc67-4e17-a756-884be6b49cd1\",\r\n"			
+				+ "   \"ip-terminal\":\"10.11.60.68\",\r\n"			
 				+ "   \"user-login\":\"Cfalcao\"\r\n"
-				+ "},"						
+				+ "},"		
+				
 				+ "   \"to\":\"573222428392\",\r\n"				
 				+ "   \"text\":\"Hola Cielo Mensaje de prueba, esta es una url\",\r\n"
 				+ "   \"customdata\":\"CUS_ID_0125\",\r\n"
@@ -49,11 +51,7 @@ public class TestLambdaHandler {
 				+ "   \"isRandomRoute\":false\r\n"				
 				+ "}";
 		
-		
-		
-		Map<String, String> headers = new HashMap<String, String>();
-		
-	
+			
 		
 		APIGatewayProxyRequestEvent request= new APIGatewayProxyRequestEvent();
 		LambdaHandler lambdaHandler = new LambdaHandler ();
@@ -69,6 +67,15 @@ public class TestLambdaHandler {
 		
 		request.setBody(body2);		
 //		request.setHeaders(headers);
+		
+		ProxyRequestContext requestContext = new ProxyRequestContext();
+		
+		requestContext.setRequestId("sasd-asdasd-asdas-dasasd");
+		requestContext.setAccountId("asdas-asdasd-asda-");
+		requestContext.setApiId("ass");
+	
+		
+		
 		
 		APIGatewayProxyResponseEvent response = lambdaHandler.handleRequest(request, null);
 		

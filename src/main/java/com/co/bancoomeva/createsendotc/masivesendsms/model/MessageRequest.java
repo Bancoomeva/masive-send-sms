@@ -1,8 +1,7 @@
 package com.co.bancoomeva.createsendotc.masivesendsms.model;
 
 public class MessageRequest {
-	
-	private HeadersAuditoria headers;
+
 	private String to;
 	private String text;
 	private String customdata;
@@ -11,16 +10,6 @@ public class MessageRequest {
 	private String isLongmessage;
 	private String isRandomRoute;
 	private RequestShortUrlConfig shortUrlConfig;
-	
-	
-
-	public HeadersAuditoria getHeaders() {
-		return headers;
-	}
-
-	public void setHeaders(HeadersAuditoria headers) {
-		this.headers = headers;
-	}
 
 	public String getTo() {
 		return to;
@@ -88,11 +77,9 @@ public class MessageRequest {
 
 	@Override
 	public String toString() {
-		return "MessageRequest [headers=" + headers + ", to=" + to + ", text=" + text + ", customdata=" + customdata
-				+ ", isPremium=" + isPremium + ", isFlash=" + isFlash + ", isLongmessage=" + isLongmessage
-				+ ", isRandomRoute=" + isRandomRoute + ", shortUrlConfig=" + shortUrlConfig + "]";
+		return "MessageRequest [to=" + to + ", text=" + text + ", customdata=" + customdata + ", isPremium=" + isPremium
+				+ ", isFlash=" + isFlash + ", isLongmessage=" + isLongmessage + ", isRandomRoute=" + isRandomRoute
+				+ ", shortUrlConfig=" + shortUrlConfig + "]";
 	}
-
-
 
 }

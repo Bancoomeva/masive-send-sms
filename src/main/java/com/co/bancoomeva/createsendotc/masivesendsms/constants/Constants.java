@@ -16,6 +16,9 @@ public class Constants {
 	public static final String VALID_URL = "SHORTURL";
 	public static final String DOMAIN_EMPTY = "Url or domain url parameters are not valid";
 
+	public static final String MESSAGE_SMS = "Peticion envio de mensaje msm masive";
+	public static final String APPLICATION ="masive-sent-sms" ;
+	
 	public static final String ERROR_SHORT_URL_CONFIG = "the field 'shortUrlConfig' cant be declare";
 
 	public static final int CARACTER_URL = 1000;
