@@ -1,0 +1,194 @@
+openapi: 3.0.3
+info:
+  title: Masiv Send SMS
+  description: |
+     Servicio expuesto para el envio de mensajes de texto SMS simples transaccionales a destinos moviles.
+  version: 1.0.0
+  
+servers:
+  - url: 'https://b1lkjsx2vl.execute-api.us-east-1.amazonaws.com/dev/api'
+  - url: 'https://b1lkjsx2vl.execute-api.us-east-1.amazonaws.com/qa/api'
+  - url: 'https://b1lkjsx2vl.execute-api.us-east-1.amazonaws.com/api'
+  
+paths: 
+   /masiv_send_sms/v1:
+    post:
+      summary: Envio de SMS 
+      description: |
+        Recurso usado para el envio de mensajes de texto SMS simples para notificacion por movil.
+      tags:
+        - Envio SMS 
+       
+      requestBody:
+        content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/smsrequest"
+      responses:
+        200:
+          $ref: "#/components/responses/responsesms"
+        400:
+          $ref: "#/components/responses/Res-400"
+        500:
+          $ref: "#/components/responses/Res-500"
+ 
+components:
+  
+  schemas:
+    headers:
+      type: object
+      required:
+        - request-date-time
+        - channel
+        - request-id
+        - ip-terminal
+        - user-login
+      properties:
+        request-date-time:
+           type: string
+           description: Formato estandar ISO 8601 de fecha y hora para el registro de la solicitud. formato vaslido AAAA-MM-DDThh:mm:ss.
+           example: "2024-07-22T11:38:13"
+        channel:
+          type: string
+          description: Canal de solicitud.
+          example: "BancaMovil"
+        request-id:
+           type: string
+           description: Identificador de la peticion.
+           maxLength: 36
+           example: "e47a6701-cc67-4e17-a756-884be6b49cd1"
+        ip-terminal:
+           type: string
+           description: Direccion IP, formato valido IPV4 y IPV6.
+           example: "10.11.60.68"
+        user-login:
+           type: string
+           description: Nombre de usuario de registro.
+           example: "Cfalcao"
+    smsrequest:
+      required:
+       - to
+       - text
+       - customdata
+      description: modelo del body para envio de mensajes SMS.
+      properties:
+        headers:
+          $ref: "#/components/schemas/headers" 
+        to:
+          type: string
+          description: Numero de movil al cual se pretende el envio de SMS.
+          example: "573124721567"
+        text:
+          type: string
+          description: Texto del mensaje a eviar.
+          example: "Ingresaste de manera exitosa a tu BancaMovil el 2024/09/04 a las 13:37:44"
+        customdata:
+          type: string
+          description: Parámetro que permite a los usuarios agregar información sobre el envío del mensaje, esta información se almacena en las bases de datos de informes. La longitud máxima permitida para este parámetro es de 1000 caracteres, si se excede esa longitud el mensaje de igual forma será recibido pero solo se almacenarán 1000 caracteres de CustomData.
+          example: CUS_ID_0125
+        isPremium:
+          type: boolean
+          description: Permite especificar si el mensaje es de Tipo Premium o no, un mensaje de tipo Premium puede incluir caracteres especiales y emoticonos, si un mensaje está marcado como tipo Premium en Falso, y adicionalmente incluye caracteres especiales o emoticonos, estos serán suprimidos de el mensaje antes de ser enviado. Si no se especifica, su valor predeterminado es false.
+          example: false
+        isFlash:
+          type: boolean
+          description: Permite especificar si el mensaje es de tipo Flash o no, un mensaje de tipo Flash, una vez recibido, se muestra automáticamente en la pantalla del celular del usuario. Si no se especifica, su valor predeterminado es false.
+          example: false
+        isLongmessage:
+          type: boolean
+          description: Este parámetro está relacionado con la longitud del mensaje a enviar, si el texto del mensaje supera los 160 caracteres, isLongMessage debe ser True, y su especificación es obligatoria, si el mensaje no supera los 160 caracteres, debe ser False pero no se hace obligatorio ya que su valor predeterminado es false. Sí, si el mensaje supera los 160 caracteres, en caso contrario, no Para el caso de Bancoomeva se debe guardar en una variable el valor 160. el nombre de la variable isLongmessage=160 y adicionar una regla que cuente los caracteres del mensaje campo  text y lo compare con la variable, si el valor del mensaje es mayor debe enviar en el body el camp isLongMessage = true
+          example: false
+        isRandomRoute:
+          type: boolean
+          description: Permite especificar si la ruta de envío debe elegirse aleatoriamente o no, su valor por defecto es False y su validación será efectiva siempre que el cliente tenga más de una ruta disponible.
+        shortUrlConfig:
+          type: object
+          description: Corresponde a un objeto que permite encapsular toda la información referente al envío de mensajes que incluyan URL corta.
+          properties:
+            url:
+              type: string
+              description: Permite especificar una URL para acortar y enviar con el mensaje, si se especifica, el texto del mensaje debe contener la palabra SHORTURL, la cual será reemplazada por la URL generada. Esta URL tiene un límite de longitud de 1000 caracteres. Si, si se especifica el objeto shortUrlConfig, de lo contrario no"
+              example: "https://www.bancoomeva.com.co/empresas/publicaciones/163490/cartera-ordinaria/"
+            domainShorturl:
+              type: string
+              description: Le permite especificar un dominio personalizado, que se usará para acortar la URL. Este dominio personalizado tiene un límite de longitud de 50 caracteres.
+              example: "https://www.bancoomeva.com.co/"    
+    reponsesms: 
+      type: object 
+      description: esquema de respuesta del servicio
+      properties:
+        statusCode:
+           type: number
+           description: Corresponde al código de respuesta HTTP para la solicitud.
+           example : 200
+        statusMessage:
+           type: string
+           description: Mensaje de descripcion.
+           example : "Message acepted for delivery"
+        messageId:   
+           type: string
+           description: Id de la transaccion.
+           example : "7dd1d82d-7fbc-44a6-bf75-37eaedf28d05"
+    Status:
+      required:
+      - Severity
+      - StatusCode
+      - StatusDesc
+      type: object
+      description: "Esquema de respuesta en caso de transacciones rechazadas o fallidas."
+      properties:
+        severity:
+          type: string
+          description: Campo que indica la severidad de la transacción (INFO, WARNING, ERROR). 
+                  INFO -> se usa cuando se tiene como respuesta una solicitud exitosa. 
+                  WARNIGN -> se usa cuando se tiene como respuesta una solicitud rechazada.
+                  ERROR -> se usa cuando se tiene como respuesta una solicitud conflictiva
+        statusDesc:
+          type: string
+          description: Campo que presenta el mensaje con información descriptiva con detalle.
+         
+        request-id:
+          type: string
+          description: Campo que representa el identificador de la solicitud con la que se envió la petición
+         
+         
+      
+      
+      
+      
+      
+  responses:
+    responsesms:
+      description: OK
+      content:
+        application.json:
+          schema:
+            type: object
+            $ref: "#/components/schemas/reponsesms"
+           
+    Res-400:
+      description: Bad Request. El servidor no ha entendido la solicitud debido a una sintaxis incorrecta.
+      content:
+        application.json:
+          schema:
+            type: object
+            properties:
+              status:
+                    $ref: "#/components/schemas/Status"
+            example:
+              status:
+                severity: "WARNIGN"
+                statusDesc: "The header 'to' cant be null or empty."
+                request-id: "e47a6701-cc67-4e17-a756-884be6b49cd1"
+  
+    Res-500:
+      description: Internal Server Error. El servidor se encontró con una condición inesperada que le impidió cumplir con la solicitud.
+      content:
+        application.json:
+          schema:
+            $ref: "#/components/schemas/Status"
+          example:
+              Status:
+                severity: "ERROR"
+                statusDesc: "Internal Server Error"    
+                request-id: "ml7q475u-ac5f-on34-7t5y-554bb6d48b3a"

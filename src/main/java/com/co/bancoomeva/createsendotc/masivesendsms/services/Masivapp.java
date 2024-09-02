@@ -2,10 +2,12 @@ package com.co.bancoomeva.createsendotc.masivesendsms.services;
 
 import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.FINISHED;
 import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.INIT;
-import static com.co.bancoomeva.auditoria.auditoria_canales.constants.Commons.NON_FOUND;
-import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.APPLICATION_JSON;
+
 import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.HEADER_AUTHORIZATION;
 import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.HEADER_CONTENT_TYPE;
+import static com.co.bancoomeva.createsendotc.masivesendsms.constants.Constants.APPLICATION_JSON;
+
+import static com.co.bancoomeva.auditoria.auditoria_canales.constants.HttpStatusCode.NON_FOUND;
 
 import java.net.URI;
 import java.net.http.HttpClient;
